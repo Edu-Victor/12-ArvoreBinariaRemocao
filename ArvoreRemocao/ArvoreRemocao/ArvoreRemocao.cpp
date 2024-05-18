@@ -83,7 +83,7 @@ void menu()
 void inicializar()
 {
 
-	// provis�rio porque n�o libera a memoria usada pela arvore
+	// provisório porque não libera a memoria usada pela arvore
 	raiz = NULL;
 
 	cout << "Arvore inicializada \n";
@@ -239,50 +239,61 @@ NO* buscarElementoArvoreComPai(NO* no, int valor, NO*& pai)
 
 
 void removerElementoArvore(NO* no, int valor) {
+	if (no == NULL) {
+		cout << "Elemento nao encontrado \n";
+		return;
+	}
+
+	// Encontra o nó a ser removido
 	NO* pai = NULL;
-	NO* atual = buscarElementoArvoreComPai(no, valor, pai);
+	NO* atual = no;
+	while (atual != NULL && atual->valor != valor) {
+		pai = atual;
+		if (valor < atual->valor)
+			atual = atual->esq;
+		else
+			atual = atual->dir;
+	}
+
+	// Se o elemento não foi encontrado
 	if (atual == NULL) {
 		cout << "Elemento nao encontrado \n";
 		return;
 	}
 
+	// Caso 1: Sem filhos ou um filho
+	NO* filho;
+	if (atual->esq != NULL)
+		filho = atual->esq;
+	else
+		filho = atual->dir;
 
-	// caso 1: sem filhos	
-	
+	if (filho == NULL) {
+		if (pai == NULL)
+			raiz = NULL;
+		else if (pai->esq == atual)
+			pai->esq = NULL;
+		else
+			pai->dir = NULL;
+		free(atual);
+		return;
+	}
 
-	// caso 2: um filho	
-	
-
-	// caso 3: dois filhos
-
-	// procura o elmento mais a esquerda da sub-arvore da direita
+	// Caso 2: Dois filhos
 	NO* sucessor = atual->dir;
-	NO* paiSucessor = atual;
+	pai = atual;
 	while (sucessor->esq != NULL) {
-		paiSucessor = sucessor;
+		pai = sucessor;
 		sucessor = sucessor->esq;
 	}
 
-	// copia o valor do sucessor para o no atual
 	atual->valor = sucessor->valor;
 
-	// se existir uma sub-arvore a direita do sucessor , entao
-	// ela deve ser ligada ao pai do sucessor
-	if (sucessor->dir != NULL)
-	{
-		paiSucessor->esq = sucessor->dir;
-	}
-	else {
-		paiSucessor->esq = NULL;
-	}
+	// Atualiza o pai do sucessor
+	if (pai->esq == sucessor)
+		pai->esq = sucessor->dir;
+	else
+		pai->dir = sucessor->dir;
 
-	//libera memoria
 	free(sucessor);
-
-
 }
-
-
-
-
-
